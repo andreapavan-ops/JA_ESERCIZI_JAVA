@@ -1,6 +1,8 @@
 
 import java.util.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class ListaDellaSpesa {
     // Attributi
@@ -157,6 +159,7 @@ public class ListaDellaSpesa {
 
     // File
     // -------------- Opzione 8 ---------------
+    @SuppressWarnings("unchecked")
     public void caricaDaFile() {
         System.out.print("Inserisci nome file: ");
         String fileName = scanner.nextLine();
@@ -181,19 +184,20 @@ public class ListaDellaSpesa {
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
             // Scrivi l'intestazione
-            writer.println("Nome,Categoria,Prezzo,Quantita,Acquistato");
+            StringBuilder csv = new StringBuilder();
+            csv.append("Nome,Categoria,Prezzo,Quantita,Acquistato\n");
             
             // Scrivi ogni articolo
-            for (Map<String, Object> a : articoli) {
-                String nome = (String) a.get("nome");
-                String categoria = (String) a.get("categoria");
-                double prezzo = (double) a.get("prezzo");
-                int quantita = (int) a.get("quantita");
-                boolean acquistato = (boolean) a.get("acquistato");
-                
-                writer.println(String.format("%s,%s,%.2f,%d,%s",
-                    nome, categoria, prezzo, quantita, acquistato));
-            }
+            for (Map<String, Object> articolo : articoli) {
+            csv.append((String) articolo.get("nome")).append(",");
+            csv.append((String) articolo.get("categoria")).append(",");
+            csv.append((double) articolo.get("prezzo")).append(",");
+            csv.append((int) articolo.get("quantita")).append(",");
+            csv.append((boolean) articolo.get("acquistato")).append("\n");
+        }
+
+        Files.writeString(Paths.get("spesa.csv"), csv.toString());
+
             
             System.out.println("\n✓ Lista salvata in \"" + fileName + "\"!");
             System.out.println("(" + articoli.size() + " articoli salvati)\n");
@@ -209,10 +213,9 @@ public class ListaDellaSpesa {
         String fileName = scanner.nextLine();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            articoli.clear(); // Pulisce la lista attuale
             
             // Salta l'intestazione
-            String header = reader.readLine();
+             reader.readLine();
             
             String line;
             int count = 0;
@@ -221,11 +224,11 @@ public class ListaDellaSpesa {
                 
                 if (parts.length == 5) {
                     Map<String, Object> articolo = new HashMap<>();
-                    articolo.put("nome", parts[0].trim());
-                    articolo.put("categoria", parts[1].trim());
-                    articolo.put("prezzo", Double.parseDouble(parts[2].trim()));
-                    articolo.put("quantita", Integer.parseInt(parts[3].trim()));
-                    articolo.put("acquistato", Boolean.parseBoolean(parts[4].trim()));
+                    articolo.put("nome", "Pane");
+                    articolo.put("categoria", "Panetteria");
+                    articolo.put("prezzo", 1.50);        // Double
+                    articolo.put("quantita", 2);          // Integer
+                    articolo.put("acquistato", false);    // Boolean
                     
                     articoli.add(articolo);
                     count++;
