@@ -1,3 +1,4 @@
+
 import java.util.*;
 import java.io.*;
 
@@ -25,7 +26,9 @@ public class ListaDellaSpesa {
         System.out.println("║ 6. Calcola totale spesa              ║");
         System.out.println("║ 7. Salva su file                     ║");
         System.out.println("║ 8. Carica da file                    ║");
-        System.out.println("║ 9. Esci                              ║");
+        System.out.println("║ 9. Salva in CSV                      ║");
+        System.out.println("║ 10. Carica da CSV                    ║");
+        System.out.println("║ 11. Esci                             ║");
         System.out.println("╚═══════════════════════════════════════╝");
         System.out.print("Seleziona un'opzione: ");
     }
@@ -166,6 +169,79 @@ public class ListaDellaSpesa {
         }
     }
 
+    // -------------- Opzione 9 - SALVA CSV ---------------
+    public void salvaCSV() {
+        System.out.print("Inserisci nome file CSV (es. spesa.csv): ");
+        String fileName = scanner.nextLine();
+        
+        // Aggiungi .csv se non presente
+        if (!fileName.endsWith(".csv")) {
+            fileName += ".csv";
+        }
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
+            // Scrivi l'intestazione
+            writer.println("Nome,Categoria,Prezzo,Quantita,Acquistato");
+            
+            // Scrivi ogni articolo
+            for (Map<String, Object> a : articoli) {
+                String nome = (String) a.get("nome");
+                String categoria = (String) a.get("categoria");
+                double prezzo = (double) a.get("prezzo");
+                int quantita = (int) a.get("quantita");
+                boolean acquistato = (boolean) a.get("acquistato");
+                
+                writer.println(String.format("%s,%s,%.2f,%d,%s",
+                    nome, categoria, prezzo, quantita, acquistato));
+            }
+            
+            System.out.println("\n✓ Lista salvata in \"" + fileName + "\"!");
+            System.out.println("(" + articoli.size() + " articoli salvati)\n");
+            
+        } catch (IOException e) {
+            System.out.println("\n❌ Errore nel salvataggio del file CSV.\n");
+        }
+    }
+
+    // -------------- Opzione 10 - CARICA CSV ---------------
+    public void caricaCSV() {
+        System.out.print("Inserisci nome file CSV: ");
+        String fileName = scanner.nextLine();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            articoli.clear(); // Pulisce la lista attuale
+            
+            // Salta l'intestazione
+            String header = reader.readLine();
+            
+            String line;
+            int count = 0;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                
+                if (parts.length == 5) {
+                    Map<String, Object> articolo = new HashMap<>();
+                    articolo.put("nome", parts[0].trim());
+                    articolo.put("categoria", parts[1].trim());
+                    articolo.put("prezzo", Double.parseDouble(parts[2].trim()));
+                    articolo.put("quantita", Integer.parseInt(parts[3].trim()));
+                    articolo.put("acquistato", Boolean.parseBoolean(parts[4].trim()));
+                    
+                    articoli.add(articolo);
+                    count++;
+                }
+            }
+            
+            System.out.println("\n✓ Lista caricata da \"" + fileName + "\"!");
+            System.out.println("(" + count + " articoli caricati)\n");
+            
+        } catch (IOException e) {
+            System.out.println("\n❌ Errore nel caricamento del file CSV.\n");
+        } catch (NumberFormatException e) {
+            System.out.println("\n❌ Formato del file CSV non valido.\n");
+        }
+    }
+
     // -------------- Metodo principale ---------------
     public static void main(String[] args) {
         ListaDellaSpesa lista = new ListaDellaSpesa();
@@ -185,9 +261,11 @@ public class ListaDellaSpesa {
                 case 6 -> lista.calcolaTotale();
                 case 7 -> lista.salvaSuFile();
                 case 8 -> lista.caricaDaFile();
-                case 9 -> System.out.println("Arrivederci!");
+                case 9 -> lista.salvaCSV();
+                case 10 -> lista.caricaCSV();
+                case 11 -> System.out.println("Arrivederci!");
                 default -> System.out.println("Opzione non valida.");
             }
-        } while (scelta != 9);
+        } while (scelta != 11);
     }
 }
