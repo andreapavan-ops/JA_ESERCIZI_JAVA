@@ -1,7 +1,5 @@
 import javax.swing.*;
 
-import apple.laf.JRSUIConstants.FrameOnly;
-
 public class PrimaFinestra {
     public static void main(String[] args) {
         // 1. Crea la finestra

@@ -1,8 +1,6 @@
 
 import java.util.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class ListaDellaSpesa {
     // Attributi
@@ -184,24 +182,20 @@ public class ListaDellaSpesa {
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
             // Scrivi l'intestazione
-            StringBuilder csv = new StringBuilder();
-            csv.append("Nome,Categoria,Prezzo,Quantita,Acquistato\n");
-            
+            writer.println("Nome,Categoria,Prezzo,Quantita,Acquistato");
+
             // Scrivi ogni articolo
             for (Map<String, Object> articolo : articoli) {
-            csv.append((String) articolo.get("nome")).append(",");
-            csv.append((String) articolo.get("categoria")).append(",");
-            csv.append((double) articolo.get("prezzo")).append(",");
-            csv.append((int) articolo.get("quantita")).append(",");
-            csv.append((boolean) articolo.get("acquistato")).append("\n");
-        }
+                writer.print((String) articolo.get("nome") + ",");
+                writer.print((String) articolo.get("categoria") + ",");
+                writer.print((double) articolo.get("prezzo") + ",");
+                writer.print((int) articolo.get("quantita") + ",");
+                writer.println((boolean) articolo.get("acquistato"));
+            }
 
-        Files.writeString(Paths.get("spesa.csv"), csv.toString());
-
-            
             System.out.println("\n✓ Lista salvata in \"" + fileName + "\"!");
             System.out.println("(" + articoli.size() + " articoli salvati)\n");
-            
+
         } catch (IOException e) {
             System.out.println("\n❌ Errore nel salvataggio del file CSV.\n");
         }
@@ -224,12 +218,12 @@ public class ListaDellaSpesa {
                 
                 if (parts.length == 5) {
                     Map<String, Object> articolo = new HashMap<>();
-                    articolo.put("nome", "Pane");
-                    articolo.put("categoria", "Panetteria");
-                    articolo.put("prezzo", 1.50);        // Double
-                    articolo.put("quantita", 2);          // Integer
-                    articolo.put("acquistato", false);    // Boolean
-                    
+                    articolo.put("nome", parts[0]);
+                    articolo.put("categoria", parts[1]);
+                    articolo.put("prezzo", Double.parseDouble(parts[2]));
+                    articolo.put("quantita", Integer.parseInt(parts[3]));
+                    articolo.put("acquistato", Boolean.parseBoolean(parts[4]));
+
                     articoli.add(articolo);
                     count++;
                 }
